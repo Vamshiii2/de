@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback Form</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      form {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        width: 100%;
+        max-width: 400px;
+        margin: auto;
+      }
+
+      h2 {
+        color: #333;
+        text-align: center;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      textarea {
+        resize: vertical;
+      }
+
+      button {
+        background-color: #ff8c00; /* Orange shade */
+        color: #fff;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+      }
+
+      button:hover {
+        background-color: #ff6f00; /* Darker orange shade on hover */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Feedback Form</h2>
+      <form id="feedbackForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required />
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required />
+
+        <label for="feedback">Feedback:</label>
+        <textarea id="feedback" name="feedback" required></textarea>
+
+        <button type="button" onclick="submitFeedback()">
+          Submit Feedback
+        </button>
+      </form>
+    </div>
+
+    <script>
+      function escapeHtml(input) {
+        return input
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+
+      function submitFeedback() {
+        const name = escapeHtml(document.getElementById("name").value);
+        const email = escapeHtml(document.getElementById("email").value);
+        const feedback = escapeHtml(document.getElementById("feedback").value);
+
+        if (!isValidEmail(email)) {
+          alert("Please enter a valid email address.");
+          return;
+        }
+
+        // Continue with submitting feedback
+        fetch("/submit-feedback", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, feedback }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            alert("Feedback submitted successfully!");
+            document.getElementById("feedbackForm").reset();
+          })
+          .catch((error) => {
+            console.error("Error during feedback submission:", error);
+            console.error("Error details:", error.message);
+            console.error("Error stack trace:", error.stack);
+          });
+      }
+    </script>
+  </body>
+</html>
